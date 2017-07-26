@@ -1,0 +1,14 @@
+dets is a rectangle list(?) of faces found
+dets.size() is number of faces found
+
+shapes is also a vector list(?) of class <full_object_detection> 
+
+shape is an instance of class <shape_predictor> 
+
+sp is also a <shape_predictor>.  argv[1] is deserialized into sp 
+
+detector is of class <frontal_face_detector>, an object_detector that looks for faces...
+
+
+for each face found, do full object detection on face sp(img,dets[j])
+each set of 
