@@ -161,7 +161,7 @@ int main()
 				full_object_detection shape = pose_model(cimg, r);
 				shapes.push_back(shape);
 #ifdef OPENCV_FACE_RENDER
-				render_face(im, shape);
+				//render_face(im, shape);
 				std::vector<cv::Point2d> image_points = get_2d_image_points(shape);
 				double focal_length = im.cols;
 				cv::Mat camera_matrix = get_camera_matrix(focal_length, cv::Point2d(im.cols / 2, im.rows / 2));
@@ -185,13 +185,13 @@ int main()
 				cv::line(im, image_points[0], nose_end_point2D[0], cv::Scalar(255, 0, 0), 2);
 				//                cv::line(im,image_points[0], projected_point, cv::Scalar(0,0,255), 2);
 
-
+				cv::putText(im, cv::format("nose %.3f %.3f", nose_end_point2D[0].x, nose_end_point2D[0].y), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
 
 
 #endif
 			}
 			// Uncomment the line below to see FPS    
-			//cv::putText(im, cv::format("fps %.2f",fps), cv::Point(50, size.height - 50), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
+			//cv::putText(im, cv::format("fps %.2f", fps), cv::Point(50, size.height - 50), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
 
 
 			// Display it all on the screen
