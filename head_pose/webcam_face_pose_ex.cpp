@@ -39,8 +39,8 @@
 using namespace dlib;
 using namespace std;
 
-#define FACE_DOWNSAMPLE_RATIO 4
-#define SKIP_FRAMES 2
+#define FACE_DOWNSAMPLE_RATIO 2.0     
+#define SKIP_FRAMES 1
 #define OPENCV_FACE_RENDER
 
 
@@ -161,7 +161,7 @@ int main()
 				full_object_detection shape = pose_model(cimg, r);
 				shapes.push_back(shape);
 #ifdef OPENCV_FACE_RENDER
-				//render_face(im, shape);
+				render_face(im, shape);
 				std::vector<cv::Point2d> image_points = get_2d_image_points(shape);
 				double focal_length = im.cols;
 				cv::Mat camera_matrix = get_camera_matrix(focal_length, cv::Point2d(im.cols / 2, im.rows / 2));
@@ -172,6 +172,8 @@ int main()
 
 				cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
+				//Is this very slow???
+				//take it out and see.  Can we just use simple hueristics to determine if face if normal to camera (using face landmarks?)
 				cv::solvePnP(model_points, image_points, camera_matrix, dist_coeffs, rotation_vector, translation_vector);
 
 				//cv::Rodrigues(rotation_vector, rotation_matrix);
