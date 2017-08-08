@@ -169,25 +169,71 @@ int main()
 				cv::Mat rotation_matrix;
 				cv::Mat translation_vector;
 
-
-				cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
+				//dont' need dist_coeffs
+				//cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
 				//Is this very slow???
 				//take it out and see.  Can we just use simple hueristics to determine if face if normal to camera (using face landmarks?)
-				cv::solvePnP(model_points, image_points, camera_matrix, dist_coeffs, rotation_vector, translation_vector);
+				//cv::solvePnP(model_points, image_points, camera_matrix, dist_coeffs, rotation_vector, translation_vector);
 
 				//cv::Rodrigues(rotation_vector, rotation_matrix);
 
-				std::vector<cv::Point3d> nose_end_point3D;
-				std::vector<cv::Point2d> nose_end_point2D;
-				nose_end_point3D.push_back(cv::Point3d(0, 0, 1000.0));
+				//std::vector<cv::Point3d> nose_end_point3D;
+				//std::vector<cv::Point2d> nose_end_point2D;
+				//nose_end_point3D.push_back(cv::Point3d(0, 0, 1000.0));
 
-				cv::projectPoints(nose_end_point3D, rotation_vector, translation_vector, camera_matrix, dist_coeffs, nose_end_point2D);
+				//not going to project from 3D to 2D
+				//cv::projectPoints(nose_end_point3D, rotation_vector, translation_vector, camera_matrix, dist_coeffs, nose_end_point2D);
 				//                cv::Point2d projected_point = find_projected_point(rotation_matrix, translation_vector, camera_matrix, cv::Point3d(0,0,1000.0));
-				cv::line(im, image_points[0], nose_end_point2D[0], cv::Scalar(255, 0, 0), 2);
+				//cv::line(im, image_points[27], image_points[30], cv::Scalar(255, 0, 0), 2);
 				//                cv::line(im,image_points[0], projected_point, cv::Scalar(0,0,255), 2);
 
-				cv::putText(im, cv::format("nose %.3f %.3f", nose_end_point2D[0].x, nose_end_point2D[0].y), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
+				//cv::putText(im, cv::format("nose %.3f %.3f", image_points[27].x, image_points[27].x), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
+
+				double faceLeft;
+				double faceRight;
+				double nSqr = 2.0;
+				double nSqRoot = 0.5;
+				cv::Scalar color = (0, 255, 0);
+		
+				faceRight = std::pow( (std::pow((shape.part(16).x() - shape.part(34).x()), nSqr) + std::pow((shape.part(16).y() - shape.part(34).y()), nSqr)), nSqRoot);
+				faceLeft  = std::pow( (std::pow((shape.part( 0).x() - shape.part(32).x()), nSqr) + std::pow((shape.part( 0).y() - shape.part(32).y()), nSqr)), nSqRoot);
+		
+				double LRRatio = 0.4;  //variance limit from facing camera
+				double TiltRatio = 0.1;  
+
+				if (faceLeft / faceRight <= (1 + LRRatio) && faceLeft / faceRight >= (1 - LRRatio))
+				{
+					cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
+				}
+				else
+				{
+					cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
+
+				}
+
+
+				double eyeDiff;
+				double bboxHeight;
+
+				eyeDiff = std::abs(shape.part(36).y() - shape.part(45).y());
+				bboxHeight = faces[i].height();
+				if (eyeDiff/ bboxHeight <= TiltRatio)
+				{
+					cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
+				}
+				else
+				{
+					cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
+
+				}
+
+
+
+
+				cv::line(im,cv::Point2d(shape.part(0).x(), shape.part(0).y()), cv::Point2d(shape.part(32).x(), shape.part(32).y()), cv::Scalar(255, 0, 0), 1);  //left blue
+				cv::line(im, cv::Point2d(shape.part(16).x(), shape.part(16).y()), cv::Point2d(shape.part(34).x(), shape.part(34).y()), cv::Scalar(0, 255, 0), 1); 
+				
 
 
 #endif
