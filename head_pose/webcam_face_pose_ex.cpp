@@ -36,12 +36,16 @@
 #include <dlib/gui_widgets.h>
 #include "render_face.hpp"
 
+#include "img_pose.h"
+
 using namespace dlib;
 using namespace std;
 
 #define FACE_DOWNSAMPLE_RATIO 2.0     
 #define SKIP_FRAMES 1
 #define OPENCV_FACE_RENDER
+
+
 
 
 std::vector<cv::Point3d> get_3d_model_points()
@@ -90,6 +94,8 @@ int main()
             cerr << "Unable to connect to camera" << endl;
             return 1;
         }
+
+
 
 
 		double fps = 30.0; // Just a place holder. Actual value calculated after 100 frames.
@@ -190,43 +196,40 @@ int main()
 
 				//cv::putText(im, cv::format("nose %.3f %.3f", image_points[27].x, image_points[27].x), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
 
-				double faceLeft;
-				double faceRight;
-				double nSqr = 2.0;
-				double nSqRoot = 0.5;
-				cv::Scalar color = (0, 255, 0);
-		
-				faceRight = std::pow( (std::pow((shape.part(16).x() - shape.part(34).x()), nSqr) + std::pow((shape.part(16).y() - shape.part(34).y()), nSqr)), nSqRoot);
-				faceLeft  = std::pow( (std::pow((shape.part( 0).x() - shape.part(32).x()), nSqr) + std::pow((shape.part( 0).y() - shape.part(32).y()), nSqr)), nSqRoot);
-		
-				double LRRatio = 0.4;  //variance limit from facing camera
-				double TiltRatio = 0.1;  
 
-				if (faceLeft / faceRight <= (1 + LRRatio) && faceLeft / faceRight >= (1 - LRRatio))
-				{
-					cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
-				}
-				else
-				{
-					cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
+				
 
-				}
+				//if (faceLeft / faceRight <= (1 + LRRatio) && faceLeft / faceRight >= (1 - LRRatio))
+				//{
+				//	cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
+				//}
+				//else
+				//{
+				//	cv::putText(im, cv::format("LR %3.2f ", faceLeft / faceRight), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
+
+				//}
+				double LR, EyeLevel, Nod;
+				int facePOSEcode;
+
+				facePOSEcode = (evaluatePOSE(shape, faces[i], LR, EyeLevel, Nod));
+				
+			
+
+				//cout << "should match faceR " << faceR << " " << faceL << " " << faceL/faceR << endl;
 
 
-				double eyeDiff;
-				double bboxHeight;
 
-				eyeDiff = std::abs(shape.part(36).y() - shape.part(45).y());
-				bboxHeight = faces[i].height();
-				if (eyeDiff/ bboxHeight <= TiltRatio)
-				{
-					cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
-				}
-				else
-				{
-					cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
+				//eyeDiff = std::abs(shape.part(36).y() - shape.part(45).y());
+				//bboxHeight = faces[i].height();
+				//if (eyeDiff/ bboxHeight <= TiltRatio)
+				//{
+				//	cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 255, 0), 1);
+				//}
+				//else
+				//{
+				//	cv::putText(im, cv::format("Tilt %3.1f %3.0f", eyeDiff, bboxHeight), cv::Point(30, size.height - 70), cv::FONT_HERSHEY_COMPLEX, 1.0, cv::Scalar(0, 0, 255), 1);
 
-				}
+				//}
 
 
 

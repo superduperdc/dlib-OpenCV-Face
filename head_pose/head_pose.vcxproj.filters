@@ -21,9 +21,15 @@
     <ClCompile Include="..\..\..\..\dlib-master\dlib\all\source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="img_pose.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="render_face.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="img_pose.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

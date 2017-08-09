@@ -22,6 +22,7 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include "render_face.hpp"
+#include "img_pose.h"
 
 #include <stdio.h>
 
@@ -47,6 +48,8 @@ String camera_input_window = "Camera capture";
 
 bool wroteAnImage = false;
 bool processSingleFace = true;
+
+int facePOSEcode;
 
 // return the filenames of all files that have the specified extension
 // in the specified directory and all subdirectories
@@ -199,29 +202,37 @@ int main(int argc, char** argv)
 
 					//render_face(im_bgr, shape);
 					std::vector<cv::Point2d> image_points = get_2d_image_points(shape);
-					double focal_length = im_bgr.cols;
-					cv::Mat camera_matrix = get_camera_matrix(focal_length, cv::Point2d(im_bgr.cols / 2, im_bgr.rows / 2));
-					cv::Mat rotation_vector;
-					cv::Mat rotation_matrix;
-					cv::Mat translation_vector;
+					//double focal_length = im_bgr.cols;
+					//cv::Mat camera_matrix = get_camera_matrix(focal_length, cv::Point2d(im_bgr.cols / 2, im_bgr.rows / 2));
+					//cv::Mat rotation_vector;
+					//cv::Mat rotation_matrix;
+					//cv::Mat translation_vector;
 
 
-					cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
+					//cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
-					cv::solvePnP(model_points, image_points, camera_matrix, dist_coeffs, rotation_vector, translation_vector);
+					//cv::solvePnP(model_points, image_points, camera_matrix, dist_coeffs, rotation_vector, translation_vector);
 
 					//cv::Rodrigues(rotation_vector, rotation_matrix);
 
-					std::vector<cv::Point3d> nose_end_point3D;
-					std::vector<cv::Point2d> nose_end_point2D;
-					nose_end_point3D.push_back(cv::Point3d(0, 0, 1000.0));
+					//std::vector<cv::Point3d> nose_end_point3D;
+					//std::vector<cv::Point2d> nose_end_point2D;
+					//nose_end_point3D.push_back(cv::Point3d(0, 0, 1000.0));
 
-					cv::projectPoints(nose_end_point3D, rotation_vector, translation_vector, camera_matrix, dist_coeffs, nose_end_point2D);
+					//cv::projectPoints(nose_end_point3D, rotation_vector, translation_vector, camera_matrix, dist_coeffs, nose_end_point2D);
 					//                cv::Point2d projected_point = find_projected_point(rotation_matrix, translation_vector, camera_matrix, cv::Point3d(0,0,1000.0));
-					cv::line(im_bgr, image_points[0], nose_end_point2D[0], cv::Scalar(255, 0, 0), 2);
+					//cv::line(im_bgr, image_points[0], nose_end_point2D[0], cv::Scalar(255, 0, 0), 2);
 					//                cv::line(im,image_points[0], projected_point, cv::Scalar(0,0,255), 2);
 
 					//cv::putText(im_bgr, cv::format("nose %.3f %.3f", nose_end_point2D[0].x, nose_end_point2D[0].y), cv::Point(30, size.height - 30), cv::FONT_HERSHEY_COMPLEX, 1.5, cv::Scalar(0, 0, 255), 3);
+
+					double LR, EyeLevel, Nod;
+
+
+					facePOSEcode = (evaluatePOSE(shape, faces[0], LR, EyeLevel, Nod));
+
+
+
 
 					//output file format:  fn, bbox, eye corners 
 					//these XY coordinates are adjusted for face bounding box later
@@ -233,7 +244,7 @@ int main(int argc, char** argv)
 						<< shape.part(42).x() << "," << shape.part(42).y() << ","
 						<< shape.part(45).x() << "," << shape.part(45).y() << ","
 						<< shape.part(30).x() << "," << shape.part(30).y() << ","					//nose tip
-						<< nose_end_point2D[0].x << "," << nose_end_point2D[0].y << endl;           //projected nose line end point
+						<< LR << "," << EyeLevel << "," << Nod << "," << facePOSEcode << endl;           //projected nose line end point
 
 					//cout << "nose end point x: " << nose_end_point2D[0].x - shape.part(30).x() << " y: " << nose_end_point2D[0].y - shape.part(30).y() << endl;
 					//if (abs((nose_end_point2D[0].x - shape.part(30).x()) / (faces[0].right() - faces[0].left())) <= 0.8 &&
@@ -283,9 +294,11 @@ int main(int argc, char** argv)
 
 
 				//save_png(tile_images(face_chips), "detected.jpg");
-
-				cout << "Hit enter to process the next image..." << endl;
-				cin.get();
+				if (facePOSEcode)
+				{
+					cout << "Hit enter to process the next image..." << endl;
+					cin.get();
+				}
 
 			}
 		}

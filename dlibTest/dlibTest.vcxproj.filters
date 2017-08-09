@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\..\..\dlib-master\dlib\all\source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\head_pose\img_pose.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\head_pose\img_pose.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
